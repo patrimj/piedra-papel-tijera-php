@@ -17,12 +17,13 @@ return new class extends Migration
             $table->unsignedBigInteger('usuario_id');
             $table->enum('tirada_jugador1', ['piedra', 'papel', 'tijera']);
             $table->enum('tirada_jugador2', ['piedra', 'papel', 'tijera']);
-            $table->enum('resultado', ['ganada', 'perdida']) ->default(null);
+            $table->enum('resultado', ['ganada', 'perdida'])->nullable();
             $table->foreign('partida_id')->references('id')->on('partidas')->onDelete('cascade'); 
-            $table->foreign('usuario_id')->references('id')->on('users')->onDelete('cascade'); 
+            $table->foreign('usuario_id')->references('id')->on('usuarios')->onDelete('cascade'); 
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.

@@ -6,8 +6,10 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use App\Models\Usuario;
 
-class inicio
+
+class Inicio
 {
     /**
      * Handle an incoming request.
@@ -15,12 +17,17 @@ class inicio
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response{
-        $usuario_id = $request->get('id');
 
-        if ($usuario_id) { // tanto administradores como usuarios registrados pueden acceder a las rutas de inicio
-            return $next($request);
-        }else{
-            return response()->json(['error' => 'No tienes permisos para acceder a esta ruta'], 403);
+        $datosUsuario = $request->all(); // recogemos los datos del usuario, del usuario porque es el que se ha logueado
+        $email = $datosUsuario['email'];
+        $password = $datosUsuario['password'];
+
+        $usuario = Usuario::where('email', $email)->where ('password', $password)->first(); // buscamos el usuario en la base de datos
+
+        if ($usuario) { 
+            return $next($request); // dejamos pasar al usuario
+        } else {
+            return response()->json(['error' => 'No tienes permisos para acceder a esta ruta'], 403); 
         }
     } 
 }

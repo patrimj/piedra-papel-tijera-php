@@ -2,10 +2,42 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Tirada;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class TiradaController extends Controller{
+
+    public function listaTiradas(){  // todas las tiradas 
+        try {
+
+            $tiradas =  Tirada::all();
+            return response()->json($tiradas,200);
+
+        }catch (\Exception $e) {
+            return response()->json(['error' => 'Error al obtener la lista de tiradas'], 500);
+        }
+    }   
+
+    public function tiradaID(Request $request){ // tirada por id
+
+        try{
+            $id = $request->get('id');
+
+            $tirada = Tirada::find($id);
+
+            if (!$tirada) {
+                return response()->json(['error' => 'La tirada no existe'], 404);
+            }else{
+                return response()->json($tirada,200);
+            }
+       
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al obtener la tirada'], 500);
+        }    
+
+    }
 
     public function realizarTirada(Request $request){
 

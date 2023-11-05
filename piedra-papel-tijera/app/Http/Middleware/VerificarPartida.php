@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Models\Partida;
 
 
-class VerificarPartidaEnCurso
+class VerificarPartida
 {
     /**
      * Handle an incoming request.

@@ -2,10 +2,43 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Partida;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PartidaController extends Controller{
+
+    public function listaPartidas(){  // todas las partidas
+        try {
+            $partidas = Partida::all();
+            return response()->json($partidas,200);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al obtener la lista de partidas'], 500);
+        }
+    }
+
+    public function partidaID(Request $request){ // partida por id
+
+        try{
+            $id = $request->get('id');
+
+            $partida = Partida::find($id);
+
+            if (!$partida) {
+                return response()->json(['error' => 'La partida no existe'], 404);
+            }else{
+                return response()->json($partida,200);
+            }
+       
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al obtener la partida'], 500);
+        }    
+
+    }
+
+
 
     public function crearPartida(Request $request){ // solo se encarga de crear una partida, si ya tiene una abierta saltara error y ya. si quiere unirse a una ya abierta deberá llamar a la funcion jugar() 
 
@@ -80,6 +113,30 @@ class PartidaController extends Controller{
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al eliminar la partida'], 500);
         }
+    }
+
+    public function finalizarPartida (Request $request ){
+            
+            try{
+                $partida_id = $request->get('id'); 
+    
+                // se busca la partida en la base de datos
+                $partida = Partida::find($partida_id);
+    
+                if (!$partida) {
+                    return response()->json(['error' => 'La partida no existe'], 404);
+    
+                } else if ($partida->finalizada == 1) {
+                    return response()->json(['mensaje' => 'La partida ya ha terminado'], 200);
+    
+                } else {
+                    DB::table('partidas')->where('id', $partida_id)->update(['finalizada' => 1]);
+                    return response()->json(['mensaje' => 'Partida finalizada'], 200);
+                }
+    
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'Error al finalizar la partida'], 500);
+            }
     }
 
     public function jugar(Request $request){ // en el post se tendra que poner usuario_id, id(id de la partida), jugador1_id, tirada_jugador1

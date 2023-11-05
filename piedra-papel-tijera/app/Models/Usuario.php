@@ -3,12 +3,24 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Partida;
 
 class Usuario extends Model
 {
+    use HasFactory;
+
+    // BBDD
     protected $table = 'usuarios';
 
-    protected $fillable = [
+    protected $primaryKey = 'id';
+    protected $keyType = 'int'; 
+    public $incrementing = true; 
+    protected $hidden = ['password']; // no se mostrará la contraseña en las consultas
+    public $timestamps = false;
+
+    // CAMPOS DE LA TABLA
+    protected $fillable = [ // campos que se pueden modificar
         'id',
         'nombre',
         'contraseña',
@@ -16,5 +28,17 @@ class Usuario extends Model
         'partidas_ganadas',
         'rol',
     ];
+
+    // RELACIONES ENTRE TABLAS
+
+    public function partidas()
+    {
+        return $this->hasMany(Partida::class, 'id_usuario', 'id');
+    }
+
+    public function tiradas()
+    {
+        return $this->hasMany(Tirada::class, 'id_usuario', 'id');
+    }
 
 }
