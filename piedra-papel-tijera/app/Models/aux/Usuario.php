@@ -27,7 +27,7 @@ class Usuario extends Model
     protected $fillable = [ // campos que se pueden modificar
         'id',
         'nombre',
-        'contraseña',
+        'password',
         'partidas_jugadas',
         'partidas_ganadas',
         'rol',

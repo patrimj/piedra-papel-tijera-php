@@ -42,7 +42,7 @@ class UsuarioController extends Controller{
         try{
             $usuario = new Usuario();
             $usuario->email = $request->get('email');
-            $usuario->contraseña = $request->get('contraseña');
+            $usuario->password = $request->get('password');
 
             $usuario->save();
             return response()->json($usuario,200);
@@ -58,7 +58,7 @@ class UsuarioController extends Controller{
 
             $usuario->nombre = $request->get('nombre');
             $usuario->email = $request->get('email');
-            $usuario->contraseña = $request->get('contraseña');
+            $usuario->password = bcrypt($request->get('password')); //encripta la contraseña antes de guardarla
             $usuario->rol = $request->get('rol');
 
             $usuario->save();
