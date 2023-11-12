@@ -5,10 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Partida;
+use App\Models\Tirada;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+
 
 class Usuario extends Model
 {
-    use HasFactory;
+    use HasApiTokens, HasFactory, Notifiable;
 
     // BBDD
     protected $table = 'usuarios';
@@ -16,7 +20,7 @@ class Usuario extends Model
     protected $primaryKey = 'id';
     protected $keyType = 'int'; 
     public $incrementing = true; 
-    protected $hidden = ['password']; // no se mostrará la contraseña en las consultas
+    protected $hidden = ['password', 'remember_token']; // no se mostrará la contraseña en las consultas
     public $timestamps = false;
 
     // CAMPOS DE LA TABLA
