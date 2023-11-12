@@ -13,14 +13,18 @@ class EncryptPassword
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next): Response 
     {
+
+    // middleware creado antes de hacer el AuthCAontroller donde ya se encripta la contraseña 
+    /*
         if ($request->has('password')) { // si el request tiene el campo password
             $password = $request->get('password'); // lo pilla
             $encryptedPassword = bcrypt($password); // lo encripta
             $request->merge(['password' => $encryptedPassword]); // y lo vuelve a meter en el request
         }
-
+    */
         return $next($request);
+
     }
 }
