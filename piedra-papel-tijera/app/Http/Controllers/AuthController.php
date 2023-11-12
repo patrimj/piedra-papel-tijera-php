@@ -72,7 +72,9 @@ class AuthController extends Controller
         try{
 
             $message = [
-                'required' => 'El campo :email :contraseña :nombre es obligatorio',
+                'nombre.required' => 'El campo nombre es obligatorio',
+                'email.required' => 'El campo email es obligatorio',
+                'contraseña.required' => 'El campo contraseña es obligatorio',
                 'email' => 'El campo :email debe ser un email',
                 'max' => 'El campo :nombre debe tener como máximo :max caracteres',
                 'min' => 'El campo :contraseña debe tener como mínimo :min caracteres',
@@ -85,7 +87,7 @@ class AuthController extends Controller
                 'email' => 'required|string|email|max:55|unique:usuarios',
                 'contraseña' => 'required|string|min:8|confirmed',
         
-            ]), $message;
+            ],$message);
     
             if ($validator->fails()) {
                 return response()->json($validator->errors(), 422);
