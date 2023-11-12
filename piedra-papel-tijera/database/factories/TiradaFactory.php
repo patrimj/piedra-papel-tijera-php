@@ -2,8 +2,10 @@
 
 namespace Database\Factories;
 
-use App\Models\Tirada;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use \App\Models\Partida;
+use \App\Models\Usuario;
+use \App\Http\Controllers\TiradaController;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Tirada>
@@ -15,16 +17,20 @@ class TiradaFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    protected $model = Tirada::class;
     public function definition(): array
     {
+        $tirada_jugador1 = $this->faker->randomElement(['piedra', 'papel', 'tijera']);
+        $tirada_jugador2 = $this->faker->randomElement(['piedra', 'papel', 'tijera']);
+    
+        $tirada = new TiradaController;
+        $resultado = $tirada->calcularResultado($tirada_jugador1, $tirada_jugador2);
+    
         return [
-            'partida_id' => $this->faker->numberBetween(1, 100),
-            'jugador1_id' => $this->faker->numberBetween(1, 100),
-            'tirada_jugador1' => $this->faker->randomElement(['Piedra','Papel','Tijera' ]),
-            'tirada_jugador2' => $this->faker->randomElement(['Piedra','Papel','Tijera' ]),
-            'resultado' => $this->faker->randomElement(['Ganada','Perdida' ]),
+            'partida_id' => Partida::factory(),
+            'usuario_id' => Usuario::factory(),
+            'tirada_jugador1' => $tirada_jugador1,
+            'tirada_jugador2' => $tirada_jugador2,
+            'resultado' => $resultado,
         ];
     }
-
 }

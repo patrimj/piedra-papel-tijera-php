@@ -2,12 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\Tirada;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use \App\Models\Tirada;
 
-
-class TiradaSeeder extends Seeder
+class TiradasSeeder extends Seeder
 {
     /**
      * Run the database seeds.

@@ -2,31 +2,65 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Partida;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use App\Models\Usuario;
+
 class PartidaController extends Controller{
+
+//FUNCIONES PARTIDA - LISTAR, CREAR, OBTENER POR ID, ELIMINAR, FINALIZAR, JUGAR, OBTENER RESULTADO, RANKING
+
+    public function listaPartidas(){  // todas las partidas
+        try {
+            $partidas = Partida::all();
+            return response()->json($partidas,200);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al obtener la lista de partidas'], 500);
+        }
+    }
+
+    public function partidaID(Request $request){ // partida por id
+
+        try{
+            $id = $request->get('id');
+
+            $partida = Partida::find($id);
+
+            if (!$partida) {
+                return response()->json(['error' => 'La partida no existe'], 404);
+            }else{
+                return response()->json($partida,200);
+            }
+       
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al obtener la partida'], 500);
+        }    
+
+    }
 
     public function crearPartida(Request $request){ // solo se encarga de crear una partida, si ya tiene una abierta saltara error y ya. si quiere unirse a una ya abierta deberá llamar a la funcion jugar() 
 
         try{
             $usuario_id = $request->get('usuario_id');// en el bdy
 
-            $partida_abierta = DB::table('partidas')//se busca si el usuario tiene una partida abierta
-                ->where('usuario_id', $usuario_id)
-                ->where('finalizada', 0) 
-                ->first();
+            $partida_abierta = Partida::where('usuario_id', $usuario_id) // buscar partida abierta
+            ->where('finalizada', 0) 
+            ->first();
 
             if ($partida_abierta) {
                 return response()->json(['error' => 'Ya tienes una partida abierta'], 400);
 
             }else{
-                $partida_id = DB::table('partidas')->insertGetId([ // insertGetId() devuelve el ID de la partida creada
-                    'usuario_id' => $usuario_id,
-                    'finalizada' => 0 
-                ]);
+                $partida = new Partida();
+                $partida->usuario_id = $usuario_id;
+                $partida->finalizada = 0;
+                $partida->save();
 
-                return response()->json(['partida_id' => $partida_id]);
+                return response()->json(['Partida' => $partida]);
             }
                 
         } catch (\Exception $e) {
@@ -40,7 +74,8 @@ class PartidaController extends Controller{
             $partida_id = $request->get('id'); 
 
             // se bysca la partida en la base de datos
-            $partida = DB::table('partidas')->where('id', $partida_id)->first();
+            $partida = Partida::find($partida_id); // con Eloquent
+            //$partida = DB::table('partidas')->where('id', $partida_id)->first(); // con Query Builder
 
             if (!$partida) {
                 return response()->json(['error' => 'La partida no existe'], 404);
@@ -64,7 +99,8 @@ class PartidaController extends Controller{
             $partida_id = $request->get('id'); 
 
             // se busca la partida en la base de datos
-            $partida = DB::table('partidas')->where('id', $partida_id)->first();
+            //$partida = DB::table('partidas')->where('id', $partida_id)->first(); // con Query Builder
+            $partida = Partida::find($partida_id); // con Eloquent
 
             if (!$partida) {
                 return response()->json(['error' => 'La partida no existe'], 404);
@@ -82,6 +118,33 @@ class PartidaController extends Controller{
         }
     }
 
+    public function finalizarPartida (Request $request ){
+            
+            try{
+                $partida_id = $request->get('id'); 
+    
+                // se busca la partida en la base de datos
+                $partida = Partida::find($partida_id);
+    
+                if (!$partida) {
+                    return response()->json(['error' => 'La partida no existe'], 404);
+    
+                } else if ($partida->finalizada == 1) {
+                    return response()->json(['mensaje' => 'La partida ya ha terminado'], 200);
+    
+                } else {
+                    $partida->finalizada = 1; // con Eloquent
+                    $partida->save();
+                    return response()->json(['mensaje' => 'Partida finalizada'], 200);
+                    //DB::table('partidas')->where('id', $partida_id)->update(['finalizada' => 1]); // con Query Builder
+                    //return response()->json(['mensaje' => 'Partida finalizada'], 200);
+                }
+    
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'Error al finalizar la partida'], 500);
+            }
+    }
+
     public function jugar(Request $request){ // en el post se tendra que poner usuario_id, id(id de la partida), jugador1_id, tirada_jugador1
         
         try {
@@ -89,7 +152,8 @@ class PartidaController extends Controller{
             $partida_id = $request->get('id'); 
     
             if ($partida_id) { // se une a una partida existente
-                $partida = DB::table('partidas')->where('id', $partida_id)->first();
+                $partida = Partida::find($partida_id); // con Eloquent 
+                //$partida = DB::table('partidas')->where('id', $partida_id)->first(); // con Query Builder
 
                 if (!$partida) {
                     return response()->json(['error' => 'La partida no existe']);
@@ -118,10 +182,16 @@ class PartidaController extends Controller{
     public function ranking(){// ranking de jugadores con más partidas ganadas
         
         try {
-            $jugadores = DB::table('usuarios')
+
+            $jugadores = Usuario::select('id', 'nombre', 'partidas_ganadas') // con Eloquent
+            ->orderByDesc('partidas_ganadas')
+            ->get();
+
+            /*
+            $jugadores = DB::table('usuarios') // Query Builder
                 ->select('id', 'nombre', 'partidas_ganadas')
                 ->orderByDesc('partidas_ganadas') // orderByDesc() ordena los resultados de forma descendente
-                ->get();
+                ->get();*/
 
             $resultados = []; // array con los resultados
 

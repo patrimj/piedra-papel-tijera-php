@@ -4,10 +4,10 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Partida;
+use \App\Models\Partida;
 
 
-class PartidaSeeder extends Seeder
+class PartidasSeeder extends Seeder
 {
     /**
      * Run the database seeds.
