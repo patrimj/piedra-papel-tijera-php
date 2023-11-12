@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('password');
             $table->integer('partidas_ganadas')->default(0);
             $table->integer('partidas_jugadas')->default(0);
-            $table->tinyInteger('rol');
+            $table->tinyInteger('rol')->default(0);
             $table->timestamps();
         });
     }
@@ -29,5 +29,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('usuarios');
+
     }
 };

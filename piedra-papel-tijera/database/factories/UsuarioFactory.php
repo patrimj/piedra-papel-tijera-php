@@ -22,7 +22,7 @@ class UsuarioFactory extends Factory
             'password' => bcrypt('password'),
             'partidas_ganadas' => $this->faker->numberBetween(0, 100),
             'partidas_jugadas' => $this->faker->numberBetween(0, 100),
-            'rol' => $this->faker->boolean,
+            'rol' => 0,
         ];
     }
 }

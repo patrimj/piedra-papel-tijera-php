@@ -12,6 +12,6 @@ class UsuarioSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\Usuario::factory(10)->create();
+        \App\Models\Usuario::factory(10)->create(['rol' => 0]);
     }
 }

@@ -41,12 +41,8 @@ class UsuarioController extends Controller{
         
         try{
             $usuario = new Usuario();
-            $usuario->nombre = $request->get('nombre');
             $usuario->email = $request->get('email');
             $usuario->contraseña = $request->get('contraseña');
-            $usuario->partidas_jugadas = $request->get('partidas_jugadas');
-            $usuario->partidas_ganadas = $request->get('partidas_ganadas');
-            $usuario->rol = $request->get('rol');
 
             $usuario->save();
             return response()->json($usuario,200);
