@@ -14,10 +14,18 @@ class AuthController extends Controller
     public function login (Request $request) {
 
         try{
+
+            $message = [
+                'email.required' => 'El campo email es obligatorio',
+                'email.email' => 'El campo email debe ser un email válido',
+                'email.max' => 'El campo email debe tener como máximo 55 caracteres',
+                'password.required' => 'El campo contraseña es obligatorio',
+                'password.min' => 'El campo contraseña debe tener como mínimo 8 caracteres',
+            ];
             $validator = Validator::make($request->all(), [ // validacion de los campos
                 'email' => 'required|string|email|max:55',
-                'contraseña' => 'required|string|min:8',
-            ]);
+                'password' => 'required|string|min:8',
+            ], $message);
     
             if ($validator->fails()) {
                 return response()->json($validator->errors(), 422);
@@ -25,16 +33,21 @@ class AuthController extends Controller
                 $usuario = Usuario::where('email', $request->email)->first(); // buscar usuario por email
             }
     
-            if (!$usuario || !Hash::check($request->contraseña, $usuario->contraseña)) { 
+            if (!$usuario || !Hash::check($request->password, $usuario->password)) { 
                 return response()->json([
                     'message' => 'datos incorrectos'
                 ], 401);
             }else{
-                $token = $usuario->createToken('authToken')->plainTextToken;
-    
+
+                if ($usuario->rol == 1) {
+                    $success['token'] =  $usuario->createToken('access_token',["admin"])->plainTextToken;
+                } else {
+                    $success['token'] =  $usuario->createToken('access_token',["user"])->plainTextToken;
+                }
+            
                 return response()->json([
-                    'usuario' => $usuario,
-                    'token' => $token
+                    'usuario' => $success,
+                    'message' => 'Inicio de sesión'
                 ], 200);
             }
 
@@ -53,7 +66,7 @@ class AuthController extends Controller
         
             $nombre = $auth->nombre; // ejemplo de como seria util usar -> $auth = Auth::user(); para acceder a los datos del usuario que ha iniciado sesion
         
-            $request->user()->currentAccessToken()->delete();
+            $request->user()->tokens()->delete();
         
             return response()->json([
                 'message' => 'sesion cerrada',
@@ -74,7 +87,7 @@ class AuthController extends Controller
             $message = [
                 'nombre.required' => 'El campo nombre es obligatorio',
                 'email.required' => 'El campo email es obligatorio',
-                'contraseña.required' => 'El campo contraseña es obligatorio',
+                'password.required' => 'El campo contraseña es obligatorio',
                 'email' => 'El campo :email debe ser un email',
                 'max' => 'El campo :nombre debe tener como máximo :max caracteres',
                 'min' => 'El campo :contraseña debe tener como mínimo :min caracteres',
@@ -82,10 +95,11 @@ class AuthController extends Controller
                 'confirmed' => 'El campo :contraseña debe ser igual al campo de confirmación',
 
             ];
+
             $validator = Validator::make($request->all(), [ // validacion de los campos
                 'nombre' => 'required|string|max:55',
                 'email' => 'required|string|email|max:55|unique:usuarios',
-                'contraseña' => 'required|string|min:8|confirmed',
+                'password' => 'required|string|min:8|confirmed',
         
             ],$message);
     
@@ -95,12 +109,19 @@ class AuthController extends Controller
                 $usuario = new Usuario();
                 $usuario->nombre = $request->nombre;
                 $usuario->email = $request->email;
-                $usuario->contraseña = Hash::make($request->contraseña);
+                $usuario->password = Hash::make($request->password);
                 $usuario->rol = $request->rol;
                 $usuario->save();
+
+            // crearemos un token para el usuario segun su rol
+                if ($usuario->rol == 1) {
+                    $success['token'] =  $usuario->createToken('access_token',["admin"])->plainTextToken;
+                } else {
+                    $success['token'] =  $usuario->createToken('access_token',["user"])->plainTextToken;
+                }
     
                 return response()->json([
-                    'usuario' => $usuario,
+                    'usuario' => $success,
                     'message' => 'usuario creado'
                 ], 201);
             }
