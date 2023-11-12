@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\DB;
 
 class PartidaController extends Controller{
 
+//FUNCIONES PARTIDA - LISTAR, CREAR, OBTENER POR ID, ELIMINAR, FINALIZAR, JUGAR, OBTENER RESULTADO, RANKING
+
     public function listaPartidas(){  // todas las partidas
         try {
             $partidas = Partida::all();
@@ -38,8 +40,6 @@ class PartidaController extends Controller{
 
     }
 
-
-
     public function crearPartida(Request $request){ // solo se encarga de crear una partida, si ya tiene una abierta saltara error y ya. si quiere unirse a una ya abierta deberá llamar a la funcion jugar() 
 
         try{
@@ -54,12 +54,12 @@ class PartidaController extends Controller{
                 return response()->json(['error' => 'Ya tienes una partida abierta'], 400);
 
             }else{
-                $partida_id = DB::table('partidas')->insertGetId([ // insertGetId() devuelve el ID de la partida creada
-                    'usuario_id' => $usuario_id,
-                    'finalizada' => 0 
-                ]);
+                $partida = new Partida();
+                $partida->usuario_id = $usuario_id;
+                $partida->finalizada = 0;
+                $partida->save();
 
-                return response()->json(['partida_id' => $partida_id]);
+                return response()->json(['Partida' => $partida]);
             }
                 
         } catch (\Exception $e) {
