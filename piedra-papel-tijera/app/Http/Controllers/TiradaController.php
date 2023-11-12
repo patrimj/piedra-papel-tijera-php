@@ -112,7 +112,7 @@ class TiradaController extends Controller{
         return $tiradas[$tirada_aleatoria];
     }
 
-    private function calcularResultado($tirada_jugador1, $tirada_jugador2)
+    public function calcularResultado($tirada_jugador1, $tirada_jugador2)
     {
         if ($tirada_jugador1 === $tirada_jugador2) {
             return 'empate';

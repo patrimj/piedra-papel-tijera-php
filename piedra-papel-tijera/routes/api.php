@@ -24,7 +24,8 @@ Route::post('/logout', [AuthController::class, 'logout']);
 Route::post('/registrarse', [AuthController::class, 'registrarse']);
 
 // CRUD DE USUARIOS SOLO ACCESIBLE PARA ADMINISTRADORES
-Route::middleware('rol', 'auth')->group(function () {
+Route::middleware(['auth','rol'])->group(function () {
+
     Route::prefix('usuario')->group(function () {
         Route::get('/todos', [UsuarioController::class, 'listaUsuarios']);
         Route::get('/{id}', [UsuarioController::class, 'usuarioID']);
@@ -35,35 +36,34 @@ Route::middleware('rol', 'auth')->group(function () {
 });
 
 // ELIMINAR PARTIDA SOLO ACCESIBLE PARA ADMINISTRADORES
-Route::middleware('rol', 'auth')->group(function () {
+Route::middleware(['auth:sanctum','rol'])->group(function () {
+
     Route::prefix('partida')->group(function () {
         Route::delete('/eliminar/{id}', [PartidaController::class, 'eliminarPartida']);
     });
 });
 
 //ACCESIBLE PARA TODOS LOS USUARIOS QUE NO SEAN ADMINISTRADORES
-Route::middleware('rol', 'auth')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('partida')->group(function () {
         Route::post('/crear', [PartidaController::class, 'crearPartida']) ->middleware ('VerificarPartida');
-
         Route::get('/todas', [PartidaController::class, 'listaPartidas']);
         Route::get('/{id}', [PartidaController::class, 'partidaID']);
         Route::get('/resultado/{id}', [PartidaController::class, 'obtenerResultado']);
         Route::put('/finalizar/{id}', [PartidaController::class, 'finalizarPartida']);
         Route::post('/jugar', [PartidaController::class, 'jugar']);
-        
-        
+        Route::get('ranking', [PartidaController::class, 'ranking']);
     });
 });
 
-Route::middleware('inicio')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('usuario')->group(function () {
         Route::get('/informacion{id}', [UsuarioController::class, 'usuarioID']);
         
     });
 });
 
-Route::middleware('inicio')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('tirada')->group(function () {
         Route::get('/todas', [TiradaController::class, 'listaTiradas']);
         Route::get('/{id}', [TiradaController::class, 'tiradaID']);
@@ -71,7 +71,7 @@ Route::middleware('inicio')->group(function () {
     });
 });
 
-Route::get('ranking', [PartidaController::class, 'ranking']);
+
 
 
 

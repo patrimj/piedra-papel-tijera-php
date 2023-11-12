@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('partidas_ganadas')->default(0);
             $table->integer('partidas_jugadas')->default(0);
             $table->tinyInteger('rol')->default(0);
+            $table->rememberToken();
             $table->timestamps();
         });
     }

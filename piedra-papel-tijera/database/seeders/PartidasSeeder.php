@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use \App\Models\Partida;
+
 
 class PartidasSeeder extends Seeder
 {
@@ -12,6 +14,6 @@ class PartidasSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\Partida::factory(10)->create();
+        Partida::factory(10)->create();
     }
 }

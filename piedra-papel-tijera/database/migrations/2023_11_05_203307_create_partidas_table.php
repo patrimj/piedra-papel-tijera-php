@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id()->unique()->autoIncrement();
             $table->unsignedBigInteger('usuario_id');
             $table->boolean('finalizada')->default(0);
-            $table->enum('resultado', ['ganada', 'perdida'])->nullable();
+            $table->enum('resultado', ['ganada', 'perdida', 'empate'])->nullable();
             $table->foreign('usuario_id')->references('id')->on('usuarios')->onDelete('cascade'); 
             $table->timestamps();
         });
