@@ -6,6 +6,8 @@ use App\Models\Partida;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use App\Models\Usuario;
+
 class PartidaController extends Controller{
 
 //FUNCIONES PARTIDA - LISTAR, CREAR, OBTENER POR ID, ELIMINAR, FINALIZAR, JUGAR, OBTENER RESULTADO, RANKING
@@ -45,10 +47,9 @@ class PartidaController extends Controller{
         try{
             $usuario_id = $request->get('usuario_id');// en el bdy
 
-            $partida_abierta = DB::table('partidas')//se busca si el usuario tiene una partida abierta
-                ->where('usuario_id', $usuario_id)
-                ->where('finalizada', 0) 
-                ->first();
+            $partida_abierta = Partida::where('usuario_id', $usuario_id) // buscar partida abierta
+            ->where('finalizada', 0) 
+            ->first();
 
             if ($partida_abierta) {
                 return response()->json(['error' => 'Ya tienes una partida abierta'], 400);
@@ -73,7 +74,8 @@ class PartidaController extends Controller{
             $partida_id = $request->get('id'); 
 
             // se bysca la partida en la base de datos
-            $partida = DB::table('partidas')->where('id', $partida_id)->first();
+            $partida = Partida::find($partida_id); // con Eloquent
+            //$partida = DB::table('partidas')->where('id', $partida_id)->first(); // con Query Builder
 
             if (!$partida) {
                 return response()->json(['error' => 'La partida no existe'], 404);
@@ -97,7 +99,8 @@ class PartidaController extends Controller{
             $partida_id = $request->get('id'); 
 
             // se busca la partida en la base de datos
-            $partida = DB::table('partidas')->where('id', $partida_id)->first();
+            //$partida = DB::table('partidas')->where('id', $partida_id)->first(); // con Query Builder
+            $partida = Partida::find($partida_id); // con Eloquent
 
             if (!$partida) {
                 return response()->json(['error' => 'La partida no existe'], 404);
@@ -130,8 +133,11 @@ class PartidaController extends Controller{
                     return response()->json(['mensaje' => 'La partida ya ha terminado'], 200);
     
                 } else {
-                    DB::table('partidas')->where('id', $partida_id)->update(['finalizada' => 1]);
+                    $partida->finalizada = 1; // con Eloquent
+                    $partida->save();
                     return response()->json(['mensaje' => 'Partida finalizada'], 200);
+                    //DB::table('partidas')->where('id', $partida_id)->update(['finalizada' => 1]); // con Query Builder
+                    //return response()->json(['mensaje' => 'Partida finalizada'], 200);
                 }
     
             } catch (\Exception $e) {
@@ -146,7 +152,8 @@ class PartidaController extends Controller{
             $partida_id = $request->get('id'); 
     
             if ($partida_id) { // se une a una partida existente
-                $partida = DB::table('partidas')->where('id', $partida_id)->first();
+                $partida = Partida::find($partida_id); // con Eloquent 
+                //$partida = DB::table('partidas')->where('id', $partida_id)->first(); // con Query Builder
 
                 if (!$partida) {
                     return response()->json(['error' => 'La partida no existe']);
@@ -175,10 +182,16 @@ class PartidaController extends Controller{
     public function ranking(){// ranking de jugadores con más partidas ganadas
         
         try {
-            $jugadores = DB::table('usuarios')
+
+            $jugadores = Usuario::select('id', 'nombre', 'partidas_ganadas') // con Eloquent
+            ->orderByDesc('partidas_ganadas')
+            ->get();
+
+            /*
+            $jugadores = DB::table('usuarios') // Query Builder
                 ->select('id', 'nombre', 'partidas_ganadas')
                 ->orderByDesc('partidas_ganadas') // orderByDesc() ordena los resultados de forma descendente
-                ->get();
+                ->get();*/
 
             $resultados = []; // array con los resultados
 
