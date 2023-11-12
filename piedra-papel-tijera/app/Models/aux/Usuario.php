@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Partida;
 use App\Models\Tirada;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+use Illuminate\Foundation\Auth\User as Authenticatable; // para poder usar el método createToken o rememberToken
 
-class Usuario extends Model
+class Usuario extends Authenticatable // cambiado de model a Authenticatable para poder usar el método createToken o rememberToken
 {
     use HasApiTokens, HasFactory, Notifiable;
 

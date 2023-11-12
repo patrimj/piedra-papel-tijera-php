@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PartidaController;
 use App\Http\Controllers\TiradaController;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\AuthController;
 
 
 /*
@@ -18,27 +19,30 @@ use App\Http\Controllers\UsuarioController;
 |
 */
 
+Route::post('/login', [AuthController::class, 'login'])->name('login'); //name para el middleware de Authenticate
+Route::post('/logout', [AuthController::class, 'logout']);
+Route::post('/registrarse', [AuthController::class, 'registrarse']);
 
 // CRUD DE USUARIOS SOLO ACCESIBLE PARA ADMINISTRADORES
-Route::middleware('rol')->group(function () {
+Route::middleware('rol', 'auth')->group(function () {
     Route::prefix('usuario')->group(function () {
         Route::get('/todos', [UsuarioController::class, 'listaUsuarios']);
         Route::get('/{id}', [UsuarioController::class, 'usuarioID']);
-        Route::post('/nuevo', [UsuarioController::class, 'nuevoUsuario'])->middleware('EncryptPassword');
-        Route::put('/modificar/{id}', [UsuarioController::class, 'modificarUsuario'])->middleware('EncryptPassword');
+        Route::post('/nuevo', [UsuarioController::class, 'nuevoUsuario']);
+        Route::put('/modificar/{id}', [UsuarioController::class, 'modificarUsuario']);
         Route::delete('/eliminar/{id}', [UsuarioController::class, 'eliminarUsuario']);
     });
 });
 
 // ELIMINAR PARTIDA SOLO ACCESIBLE PARA ADMINISTRADORES
-Route::middleware('rol')->group(function () {
+Route::middleware('rol', 'auth')->group(function () {
     Route::prefix('partida')->group(function () {
         Route::delete('/eliminar/{id}', [PartidaController::class, 'eliminarPartida']);
     });
 });
 
 //ACCESIBLE PARA TODOS LOS USUARIOS QUE NO SEAN ADMINISTRADORES
-Route::middleware('inicio')->group(function () {
+Route::middleware('rol', 'auth')->group(function () {
     Route::prefix('partida')->group(function () {
         Route::post('/crear', [PartidaController::class, 'crearPartida']) ->middleware ('VerificarPartida');
 

@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Http\Middleware\inicio;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,18 +15,12 @@ class Rol{ // inicio de sesión para que solo los usuarios registrados puedan ac
      */
     public function handle(Request $request, Closure $next): Response { 
 
-        $usuarioAutenticado = new Inicio();
-        $usuarioAutenticado = $usuarioAutenticado->handle($request, $next); // comprobamos que el usuario está autenticado
+        $user = $request->user(); // recogemos el usuario autenticado
 
-        if ($usuarioAutenticado->getStatusCode() == 200) { // si el usuario está autenticado
-            $usuario = $request->user(); // recogemos el usuario autenticado --> user() es un método de la clase Request que devuelve el usuario autenticado
-            if ($usuario->rol == 1) { 
-                return $next($request); 
-            } else {
-                return response()->json(['error' => 'No tienes permisos para acceder a esta ruta'], 403); 
-            }
+        if ($user && $user->tokenCan('admin')) { // comprobamos que el usuario está autenticado y que su token tiene el permiso 'admin'
+            return $next($request); 
         } else {
-            return $usuarioAutenticado; // devolvemos el error de inicio
+            return response()->json(['error' => 'No tienes permisos para acceder a esta ruta'], 403); 
         }
     }
 }
